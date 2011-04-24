@@ -1,0 +1,48 @@
+<html>
+<head>
+<script src="http://maps.google.com/maps?file=api&v=2&sensor=false&key=ABQIAAAAj72lrR_4Y9Zlw5HwH0qMgRSHnp_kYP8v0i95eEWYCgGYaSu6bxQgnXpSVS-zWMuAK_SMpdzk8mWbvw" type="text/javascript"></script>
+  <script>
+  function initialize() {
+    if (GBrowserIsCompatible()) {
+      var map = new GMap2(document.getElementById("map_canvas"));
+      map.setUIToDefault();
+
+      var polyline = new GPolyline([
+        {% for r in reccords %}
+          new GLatLng({{r.Pos}}),
+        {% endfor %}
+      ], "#ff0000", 10);
+      map.addOverlay(polyline);
+
+      {% for r in reccords %}
+      {
+        var point = new GLatLng({{r.Pos}});
+        var marker = new GMarker(point);
+        var info = "<pre>";
+        info += "Loc    : {{r.Pos}}<br>";
+        info += "Time   : {{r.Date}}<br>";
+        info += "Course : {{r.Course}}<br>";
+        info += "Speed  : {{r.Speed}}";
+        info += "</pre>";
+        marker.bindInfoWindow(info);
+        map.addOverlay(marker);
+      }
+      {% endfor %}
+
+      map.setCenter(new GLatLng({{reccords.0.Pos}}), 13);
+    }
+  }
+  </script>
+</head>
+<body onload="initialize()" onunload="GUnload()">
+  <div id="map_canvas" style="width: 100%; height: 100%"></div>
+
+  <div style="display:none">
+    <ul>
+      {% for r in reccords %}
+        <li>{{ r.raw }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>

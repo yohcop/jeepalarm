@@ -1,0 +1,15 @@
+application: CHANGE_ME_APP_ID
+version: 1
+runtime: python
+api_version: 1
+
+inbound_services:
+- mail
+
+handlers:
+- url: /_ah/mail/CHANGE_ME_SECRET_EMAIL@CHANGE_ME_APP_ID\.appspotmail\.com
+  script: handle_incoming_email.py
+  login: admin
+- url: /.*
+  script: list.py
+  login: admin
