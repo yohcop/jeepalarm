@@ -1,0 +1,3 @@
+JeepAlarm is a lo-jack alarm, based on an arduino, with a cellular shield, a GPS and a RFID reader. SMS are sent to Google voice, to GMail, redirected to appengine, to finally be displayed on Google Maps.
+
+See blog post at http://b.leppoc.net/2011/04/23/operation-lo-jack/ for more info.
