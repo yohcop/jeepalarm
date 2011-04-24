@@ -50,6 +50,8 @@ String allowedOrigin[allowedOriginSize] = {
   ACCEPT_FROM_PHONE_1, ACCEPT_FROM_PHONE_2 };
 // from millis();
 unsigned long lastSmsSent = 0;
+int cellErrors = 0;
+#define CELL_MAX_ERRORS 10  // Number of errors before reseting the cell shield.
 
 // ALARM STATE ========================================================
 boolean alarm = true;
@@ -220,6 +222,12 @@ void CELLsetup() {
   //CELLdelay(200);
   //cell.println("AT+CMGL=\"ALL\"");  // List all text messages
   //CELLdelay(15000);
+}
+
+void CELLreset() {
+  Serial.println("Reset cell shield");
+  cell.println("AT+CFUN=1,1");
+  cellErrors = 0;
 }
 
 boolean SerialReadUntil(NewSoftSerial* serial, String key, int timeout) {
@@ -545,6 +553,8 @@ void CELLSendSMS() {
   if (sent) {
     lastSmsSent = millis();
     ping = false;
+  } else {
+    cellErrors++;
   }
 }
 
@@ -610,6 +620,7 @@ void CELLturn() {
   cell.println("AT+CMGF=1"); // set SMS mode to text
   if (!SerialReadUntil(&cell, "OK", 5*1000)) {
     Serial.println("Not ready for text?");
+    cellErrors++;
     //return;
   }
 
@@ -620,10 +631,15 @@ void CELLturn() {
 
   cell.println("AT+CNMI=3,3");
   if (!SerialReadUntil(&cell, "OK", 5*1000)) {
+    cellErrors++;
     return;
   }
 
   CELLreadMessages();
+
+  if (cellErrors >= CELL_MAX_ERRORS) {
+    CELLreset();
+  }
 }
 
 void CELLconsume() {
